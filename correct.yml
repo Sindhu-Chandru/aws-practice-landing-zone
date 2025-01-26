@@ -1,0 +1,52 @@
+name: Terraform Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout the repository
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # Set up Terraform
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.5.0 # specify the Terraform version you want to use
+
+    # Configure AWS credentials for Terraform
+    - name: Set up AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws_region: us-west-2  # replace with your AWS region
+
+    # Initialize Terraform
+    - name: Terraform Init
+      run: terraform init
+
+    # Import AWS Organizational Units into Terraform state
+    - name: Import AWS Organizational Units
+      run: |
+        terraform import aws_organizations_organizational_unit.security ou-1p5x-ux35kcco
+        terraform import aws_organizations_organizational_unit.prod ou-1p5x-ac2cdlm4
+        terraform import aws_organizations_organizational_unit.dev ou-1p5x-ntta1458
+
+    # Validate Terraform configuration
+    - name: Terraform Validate
+      run: terraform validate
+
+    # Plan Terraform changes
+    - name: Terraform Plan
+      run: terraform plan
+
+    # Apply Terraform changes (if necessary)
+    - name: Terraform Apply
+      run: terraform apply -auto-approve
