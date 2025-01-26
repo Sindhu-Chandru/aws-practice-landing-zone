@@ -1,7 +1,7 @@
 # Create an AWS Organization
-resource "aws_organizations_organization" "main" {
-  feature_set = "ALL"
-}
+#resource "aws_organizations_organization" "main" {
+#  feature_set = "ALL"
+#}
 
 # Create Organizational Units (OUs)
 resource "aws_organizations_organizational_unit" "dev" {
