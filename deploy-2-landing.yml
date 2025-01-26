@@ -1,0 +1,32 @@
+name: Terraform Plan & Apply
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v2
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Import existing OU resources
+      run: |
+        terraform import aws_organizations_organizational_unit.dev ou-1p5x-ntta1458
+        terraform import aws_organizations_organizational_unit.prod ou-1p5x-ac2cdlm4
+        terraform import aws_organizations_organizational_unit.security ou-1p5x-ux35kcco
+
+    - name: Terraform Plan
+      run: terraform plan
+
+    - name: Terraform Apply
+      run: terraform apply -auto-approve
