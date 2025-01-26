@@ -15,14 +15,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout repository
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # Step 2: Set up Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.5.6
 
+      # Step 3: Configure AWS Credentials
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
@@ -30,11 +33,23 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      # Step 4: Terraform Init
       - name: Terraform Init
         run: terraform init
 
+      # Step 5: Terraform Refresh (Optional - only if needed)
+      - name: Terraform Refresh
+        run: terraform refresh
+
+      # Step 6: Terraform Plan
       - name: Terraform Plan
         run: terraform plan -out=tfplan
 
+      # Step 7: Terraform Destroy (Optional - only if needed)
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve
+        if: github.event_name == 'push'  # Example condition to control when to run destroy
+
+      # Step 8: Terraform Apply (Auto approve the plan)
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
